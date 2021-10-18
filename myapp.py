@@ -195,7 +195,7 @@ def main():
 				job_data['Description'] = job_data['Description'].str.replace('\n',' ')
 					
 				
-				#print(job_data.info())
+				print(job_data.info())
 				st.subheader("Data Hasil Scrap")
 				#job_data.head()
 				job_data.to_csv('datascraptest2.csv', index=0, encoding='utf-8')
