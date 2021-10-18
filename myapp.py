@@ -33,6 +33,23 @@ from nltk.stem import WordNetLemmatizer
 stop_words = set(stopwords.words('english'))
 print (stop_words)
 
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.wait import WebDriverWait
+
+options = Options()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-gpu")
+options.add_argument("--disable-features=NetworkService")
+options.add_argument("--window-size=1920x1080")
+options.add_argument("--disable-features=VizDisplayCompositor")
+
+def get_chromedriver_path():
+    results = glob.glob('/**/chromedriver', recursive=True)  # workaround on streamlit sharing
+    which = results[0]
+    return which
+	
 #packages Link
 from selenium import webdriver
 
@@ -69,7 +86,7 @@ def main():
 				
 		if st.button("Download_CV"):
 			try:
-				driver = webdriver.Chrome (executable_path="chromedriver.exe")
+				driver = webdriver.Chrome (options=options, service_log_path='selenium.log')
 				# driver.get("https://drive.google.com")
 				# identify element with partial link text and click()
 				#l=driver.find_element_by_partial_link_text("Download")
