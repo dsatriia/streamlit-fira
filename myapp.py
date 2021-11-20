@@ -104,17 +104,45 @@ c = conn.cursor()
 def create_usertable():
 	c.execute("CREATE TABLE IF NOT EXISTS userstable(username TEXT,password TEXT)")
 
+def is_user_exist(username):
+	c.execute("SELECT * FROM userstable WHERE username = ?", (username,))
+	data = c.fetchall()
+	return data
+
+def delete_userdata(username):
+	
+	if len(is_user_exist(username)) < 1:
+		return False
+	c.execute("DELETE FROM userstable WHERE username = ?", (username,))
+
+	conn.commit()
+	return True
 
 def add_userdata(username, password):
+	
+	if is_user_exist(username):
+		return False
+		
 	c.execute(
-		"INSERT INTO userstable(username,password) VALUES (?,?)", (username, password)
+		"INSERT INTO userstable(username,password,role) VALUES (?,?,?)", (username, password,"user")
 	)
 	conn.commit()
+	return True
+
+def add_admindata(username, password):
+	if is_user_exist(username):
+		return False
+
+	c.execute(
+		"INSERT INTO userstable(username,password,role) VALUES (?,?,?)", (username, password,"admin")
+	)
+	conn.commit()
+	return True
 
 
 def login_user(username, password):
 	c.execute(
-		"SELECT * FROM userstable WHERE username =? AND password = ?",
+		"SELECT * FROM userstable WHERE username =? AND password = ? AND role = 'user'",
 		(username, password),
 	)
 	data = c.fetchall()
@@ -635,9 +663,12 @@ def main():
 
 		if st.button("Signup"):
 			create_usertable()
-			add_userdata(new_user, make_hashes(new_password))
-			st.success("You have successfully created a valid Account")
-			st.info("Go to Login Menu to login")
+			if add_userdata(new_user, make_hashes(new_password)):
+				st.success("You have successfully created a valid Account")
+				st.info("Go to Login Menu to login")	
+			else:
+				st.warning("Username already exist")
+			
 
 	elif choice == "About":
 		st.title("About")
@@ -657,7 +688,28 @@ def main():
 			result_admin = login_admin(username, check_hashes(password, hashed_pswd))
 			result_user = login_user(username, check_hashes(password, hashed_pswd))
 			if result_admin:
-				st.write("User Profiles")
+				st.subheader("Add Admin")
+				new_admin_username = st.text_input("New Username")
+				new_admin_password = st.text_input("New Password", type="password")
+
+				if st.button("Add new Admin"):			
+					if add_admindata(new_admin_username, make_hashes(new_admin_password)):
+						st.success("You have successfully created a valid Admin Account")						
+					else:
+						st.warning("Username already exist")
+				st.markdown("""---""")
+
+				st.subheader("Delete User")
+				username = st.text_input("Username")				
+
+				if st.button("Delete User"):			
+					if delete_userdata(username):
+						st.success("You have successfully delete user : "+username)						
+					else:
+						st.warning("Username not found")
+				st.markdown("""---""")
+
+				st.subheader("User Profiles")
 				user_result = view_all_users()
 				clean_db = pd.DataFrame(
 					user_result, columns=["Username", "Password", "Role"]
