@@ -33,9 +33,7 @@ import gensim
 import streamlit as st
 import os
 
-os.environ[
-	"LI_AT_COOKIE"
-] = "AQEDAThq-1kDgBxGAAABfO4gbn4AAAF9Eizyfk4AoECSU86HrlPjN4Df0JWV7a8MF73_M78yNCcLgqKw-v1lveNyem9YyOirZLXV7LqLFx8AqSLnzvUJafmOcpgN8ZS8ytjH9GS0wx5hYXHqTaGJ-Uvd"
+os.environ["LI_AT_COOKIE"] = "AQEDAThq-1kDgBxGAAABfO4gbn4AAAF9Eizyfk4AoECSU86HrlPjN4Df0JWV7a8MF73_M78yNCcLgqKw-v1lveNyem9YyOirZLXV7LqLFx8AqSLnzvUJafmOcpgN8ZS8ytjH9GS0wx5hYXHqTaGJ-Uvd"
 
 # Load LSA
 
