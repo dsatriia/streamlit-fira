@@ -365,6 +365,7 @@ def main():
 								job_location = []
 								job_des = []
 								link = []
+								total_employees = []
 
 								def on_data(data: EventData):
 									#     print('[ON_DATA]', data.title, data.company, data.date, data.description, data.link, len(data.description))
@@ -391,6 +392,7 @@ def main():
 									)
 									# 								job_des.append(data.description)
 									link.append(data.link)
+									total_employees.append(data.total_employees)
 
 								def on_error(error):
 									print("[ON_ERROR]", error)
@@ -441,6 +443,7 @@ def main():
 										"Job_ID": id,
 										"Date": post_date,
 										"Company Name": company_name,
+										"Total Employees": total_employees,
 										"Job_Title": post_title,
 										"Location": job_location,
 										"Description": job_des,
