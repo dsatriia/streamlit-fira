@@ -70,13 +70,13 @@ class LinkedinScraper:
         }
 
         if Config.LI_AT_COOKIE:
-            info(f'Using strategy {AuthenticatedStrategy.__name__}')
+            info(f'Using strategy auth {AuthenticatedStrategy.__name__}')
             self._strategy = AuthenticatedStrategy(self)
 
             if proxies:
                 warn(f'Proxy mode is currently not supported in {AuthenticatedStrategy.__name__}')
         else:
-            info(f'Using strategy {AnonymousStrategy.__name__}')
+            info(f'Using strategy anon {AnonymousStrategy.__name__}')
             self._strategy = AnonymousStrategy(self)
 
     @staticmethod
