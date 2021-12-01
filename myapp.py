@@ -193,7 +193,7 @@ def main():
 		username = st.sidebar.text_input("User Name")
 		password = st.sidebar.text_input("Password", type="password")
 		
-		if st.sidebar.button("Login"):
+		if st.sidebar.checkbox("Login"):
 			create_usertable()
 			hashed_pswd = make_hashes(password)
 			result = login_user(username, check_hashes(password, hashed_pswd))
@@ -713,7 +713,7 @@ def main():
 
 		st.title("Profiles")
 
-		if st.sidebar.button("Login Admin"):
+		if st.sidebar.checkbox("Login Admin"):
 			create_usertable()
 			hashed_pswd = make_hashes(password)
 			result_admin = login_admin(
