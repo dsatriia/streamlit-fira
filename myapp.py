@@ -34,7 +34,8 @@ import streamlit as st
 import os
 
 os.environ["LI_AT_COOKIE"] = "AQEDATL5DxIAV9iyAAABfXYyjjgAAAF9mj8SOFYApeRK1b5Jn2eD4jwNYUzlMLwNrBBoayd8yMP0B1afCK_HmMyHqCSdjwH3AF8UDMVC3W3pacGjIpIj-Y4vgph6hx3Uis9Cv4mzkSdzncKvgHe3xJLl"
-
+print("debug nih")
+print(os.environ['LI_AT_COOKIE'])
 # Load LSA
 
 # Packages Scraping
