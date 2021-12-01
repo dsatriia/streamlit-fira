@@ -223,6 +223,7 @@ def main():
 							job_des = []
 							link = []
 							total_employees = []
+							actively_recruiting = []
 
 							def on_data(data: EventData):
 								print(
@@ -256,6 +257,7 @@ def main():
 								job_des.append(job_desc)
 								link.append(data.link)
 								total_employees.append(data.total_employees)
+								actively_recruiting.append(data.actively_recruiting)
 								# print(data.description)
 								# print(job_desc)
 
@@ -305,8 +307,9 @@ def main():
 								{
 									"Job_ID": id,
 									"Date": post_date,
-									"Company Name": company_name,
+									"Company Name": company_name,									
 									"Total Employees": total_employees,
+									"Actively Recruiting": actively_recruiting,
 									"Job_Title": post_title,
 									"Location": job_location,
 									"Description": job_des,
@@ -366,6 +369,7 @@ def main():
 								job_des = []
 								link = []
 								total_employees = []
+								actively_recruiting = []
 
 								def on_data(data: EventData):
 									#     print('[ON_DATA]', data.title, data.company, data.date, data.description, data.link, len(data.description))
@@ -393,6 +397,7 @@ def main():
 									# 								job_des.append(data.description)
 									link.append(data.link)
 									total_employees.append(data.total_employees)
+									actively_recruiting.append(data.actively_recruiting)
 
 								def on_error(error):
 									print("[ON_ERROR]", error)
@@ -442,8 +447,9 @@ def main():
 									{
 										"Job_ID": id,
 										"Date": post_date,
-										"Company Name": company_name,
+										"Company Name": company_name,										
 										"Total Employees": total_employees,
+										"Actively Recruiting": actively_recruiting,
 										"Job_Title": post_title,
 										"Location": job_location,
 										"Description": job_des,
