@@ -36,6 +36,7 @@ class Selectors(NamedTuple):
     pagination = '.jobs-search-two-pane__pagination'
     paginationNextBtn = 'li[data-test-pagination-page-btn].selected + li'
     paginationBtn = lambda index: f'li[data-test-pagination-page-btn="{index}"] button'
+    
 
 
 class AuthenticatedStrategy(Strategy):
@@ -388,7 +389,8 @@ class AuthenticatedStrategy(Strategy):
                     seniority_level=job_seniority_level,
                     job_function=job_function,
                     employment_type=job_employment_type,
-                    industries=job_industries)
+                    industries=job_industries,
+                    total_employees="123")
 
                 info(tag, 'Processed')
 
