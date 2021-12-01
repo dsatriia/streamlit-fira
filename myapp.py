@@ -669,7 +669,7 @@ def main():
 					st.subheader("User Profiles")
 					user_result = view_all_users()
 					clean_db = pd.DataFrame(
-						user_result, columns=["Username", "Password"]
+						user_result, columns=["Username", "Password", "Role"]
 					)
 					st.dataframe(clean_db)
 
