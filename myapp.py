@@ -53,6 +53,9 @@ if 'isSearched' not in st.session_state:
 if 'isUser' not in st.session_state:
     st.session_state['isUser'] = False
 
+if 'isAdmin' not in st.session_state:
+    st.session_state['isAdmin'] = False
+
 # package gambar
 
 
@@ -670,7 +673,8 @@ def main():
 				st.image(image, caption="Format CV")
 
 			elif task == "Profiles":
-				st.subheader("User Profiles")
+				st.subheader("User Profiles")				
+
 				user_result = view_all_users()
 				clean_db = pd.DataFrame(
 					user_result, columns=["Username", "Password", "Role"]
@@ -712,54 +716,63 @@ def main():
 	elif choice == "Profiles":
 		username = st.sidebar.text_input("Username Admin")
 		password = st.sidebar.text_input("Password Admin", type="password")
+		result_admin = False
+		result_user = False
 
 		st.title("Profiles")
 
-		if st.sidebar.checkbox("Login Admin"):
+		if st.sidebar.button("Login Admin"):
 			create_usertable()
 			hashed_pswd = make_hashes(password)
 			result_admin = login_admin(
 				username, check_hashes(password, hashed_pswd))
 			result_user = login_user(
 				username, check_hashes(password, hashed_pswd))
-			if result_admin:
-				st.subheader("Add Admin")
-				new_admin_username = st.text_input("New Username")
-				new_admin_password = st.text_input(
-					"New Password", type="password")
+		
 
-				if st.button("Add new Admin"):
-					if add_admindata(new_admin_username, make_hashes(new_admin_password)):
-						st.success(
-							"You have successfully created a valid Admin Account")
-					else:
-						st.warning("Username already exist")
-				st.markdown("""---""")
+		if result_user:
+			st.session_state.isUser = True
 
-				st.subheader("Delete User")
-				username = st.text_input("Username")
+		if result_admin:
+			st.session_state.isAdmin = True
 
-				if st.button("Delete User"):
-					if delete_userdata(username):
-						st.success(
-							"You have successfully delete user : "+username)
-					else:
-						st.warning("Username not found")
-				st.markdown("""---""")
+		if st.session_state.isAdmin == True:
+			st.subheader("Add Admin")
+			new_admin_username = st.text_input("New Username")
+			new_admin_password = st.text_input(
+				"New Password", type="password")
 
-				st.subheader("User Profiles")
-				user_result = view_all_users()
-				clean_db = pd.DataFrame(
-					user_result, columns=["Username", "Password", "Role"]
-				)
-				st.dataframe(clean_db)
-			elif result_user:
-				st.warning("Anda hanya user biasa, bukan admin.")
-			else:
-				st.error("Incorrect Username/Password")
+			if st.button("Add new Admin"):
+				if add_admindata(new_admin_username, make_hashes(new_admin_password)):
+					st.success(
+						"You have successfully created a valid Admin Account")
+				else:
+					st.warning("Username already exist")
+			st.markdown("""---""")
+
+			st.subheader("Delete User")
+			username = st.text_input("Username")
+
+			if st.button("Delete User"):
+				if delete_userdata(username):
+					st.success(
+						"You have successfully delete user : "+username)
+				else:
+					st.warning("Username not found")
+			st.markdown("""---""")
+
+			st.subheader("User Profiles")
+			user_result = view_all_users()
+			clean_db = pd.DataFrame(
+				user_result, columns=["Username", "Password", "Role"]
+			)
+			st.dataframe(clean_db)
+		elif st.session_state.isUser == True:
+			st.warning("Anda hanya user biasa, bukan admin.")
 		else:
 			st.info(
 				"Halaman ini hanya bisa diakses oleh admin. Silahkan login sebagai admin terlebih dahulu.")
+		
 
 
 if __name__ == "__main__":
