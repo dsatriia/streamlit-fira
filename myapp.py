@@ -187,8 +187,7 @@ def main():
 		st.image(image, width=600)
 
 	elif choice == "Login":
-		st.title("Login Section")
-		st.write(st.session_state.isUser)
+		st.title("Login Section")		
 
 		username = st.sidebar.text_input("User Name")
 		password = st.sidebar.text_input("Password", type="password")
