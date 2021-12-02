@@ -355,6 +355,7 @@ def main():
 						TypeFilters.CONTRACT,
 					]
 					jobtype = st.selectbox("Job_Type", filter_jobtype)
+					
 					filter_time = [
 						None,
 						TimeFilters.DAY,
@@ -363,6 +364,13 @@ def main():
 						TimeFilters.ANY,
 					]
 					time_iklan = st.selectbox("Date Posted", filter_time)
+
+					filter_actively_recruiting = [
+						None,
+						"Yes",
+						"No"
+					]
+					selected_filter_actively_recruiting = st.selectbox("Actively Recruiting", filter_actively_recruiting)
 
 					if st.button("Perbarui Iklan"):
 						try:
@@ -379,32 +387,61 @@ def main():
 							actively_recruiting = []
 
 							def on_data(data: EventData):
-								#     print('[ON_DATA]', data.title, data.company, data.date, data.description, data.link, len(data.description))
-								post_title.append(
-									translator.translate(
-										data.title, lang_src="auto", lang_tgt="en"
+								
+								if selected_filter_actively_recruiting == None:
+									post_title.append(
+										translator.translate(
+											data.title, lang_src="auto", lang_tgt="en"
+										)
 									)
-								)
-								# 								post_title.append(data.title)
-								id_job = len(post_title)
-								id.append(id_job)
-								job_location.append(data.place)
-								company_name.append(
-									translator.translate(
-										data.company, lang_src="auto", lang_tgt="en"
+									# 								post_title.append(data.title)
+									id_job = len(post_title)
+									id.append(id_job)
+									job_location.append(data.place)
+									company_name.append(
+										translator.translate(
+											data.company, lang_src="auto", lang_tgt="en"
+										)
 									)
-								)
-								# 								company_name.append(data.company)
-								post_date.append(data.date)
-								job_des.append(
-									translator.translate(
-										data.description, lang_src="auto", lang_tgt="en"
+									# 								company_name.append(data.company)
+									post_date.append(data.date)
+									job_des.append(
+										translator.translate(
+											data.description, lang_src="auto", lang_tgt="en"
+										)
 									)
-								)
-								# 								job_des.append(data.description)
-								link.append(data.link)
-								total_employees.append(data.total_employees)
-								actively_recruiting.append(data.actively_recruiting)
+									# 								job_des.append(data.description)
+									link.append(data.link)
+									total_employees.append(data.total_employees)
+									actively_recruiting.append(data.actively_recruiting)
+								
+								elif data.actively_recruiting == selected_filter_actively_recruiting:
+									post_title.append(
+										translator.translate(
+											data.title, lang_src="auto", lang_tgt="en"
+										)
+									)
+									# 								post_title.append(data.title)
+									id_job = len(post_title)
+									id.append(id_job)
+									job_location.append(data.place)
+									company_name.append(
+										translator.translate(
+											data.company, lang_src="auto", lang_tgt="en"
+										)
+									)
+									# 								company_name.append(data.company)
+									post_date.append(data.date)
+									job_des.append(
+										translator.translate(
+											data.description, lang_src="auto", lang_tgt="en"
+										)
+									)
+									# 								job_des.append(data.description)
+									link.append(data.link)
+									total_employees.append(data.total_employees)
+									actively_recruiting.append(data.actively_recruiting)
+								
 
 							def on_error(error):
 								print("[ON_ERROR]", error)
@@ -454,7 +491,7 @@ def main():
 								{
 									"Job_ID": id,
 									"Date": post_date,
-									"Company Name": company_name,										
+									"Company Name": company_name,							
 									"Total Employees": total_employees,
 									"Actively Recruiting": actively_recruiting,
 									"Job_Title": post_title,
