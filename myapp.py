@@ -61,6 +61,10 @@ if 'isAdmin' not in st.session_state:
 
 options = Options()
 
+# variable contains all countries name in the world
+countries_name = ["Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegowina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Cocos (Keeling) Islands", "Colombia", "Comoros", "Congo", "Congo, the Democratic Republic of the", "Cook Islands", "Costa Rica", "Cote d'Ivoire", "Croatia (Hrvatska)", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Falkland Islands (Malvinas)", "Faroe Islands", "Fiji", "Finland", "France", "France Metropolitan", "French Guiana", "French Polynesia", "French Southern Territories", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Heard and Mc Donald Islands", "Holy See (Vatican City State)", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran (Islamic Republic of)", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, Democratic People's Republic of", "Korea, Republic of", "Kuwait", "Kyrgyzstan", "Lao, People's Democratic Republic", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libyan Arab Jamahiriya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia, The Former Yugoslav Republic of", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia, Federated States of", "Moldova, Republic of", "Monaco", "Mongolia", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn", "Poland", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russian Federation", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Seychelles", "Sierra Leone", "Singapore", "Slovakia (Slovak Republic)", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia and the South Sandwich Islands", "Spain", "Sri Lanka", "St. Helena", "St. Pierre and Miquelon", "Sudan", "Suriname", "Svalbard and Jan Mayen Islands", "Swaziland", "Sweden", "Switzerland", "Syrian Arab Republic", "Taiwan, Province of China", "Tajikistan", "Tanzania, United Republic of", "Thailand", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "United States Minor Outlying Islands", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Virgin Islands (British)", "Virgin Islands (U.S.)", "Wallis and Futuna Islands", "Western Sahara", "Yemen", "Yugoslavia", "Zambia", "Zimbabwe"]
+
+
 
 def get_chromedriver_path():
 	results = glob.glob(
@@ -211,138 +215,172 @@ def main():
 
 			if task == "Recommend":
 				st.title("Job Recommender")
-				st.subheader("Perbarui Iklan Linkedin")
-				Negara = st.text_input("Input Negara")
-				job_title = st.text_input("Input Job Title")
-				# jum = st.number_input("Input Banyak Iklan yang ingin Ditelusuri")
-				jum = st.number_input(
-					"Input Banyak Iklan yang ingin Ditelusuri", 2, 100, 5
-				)  # mulai,max,default
-				if st.button("Perbarui"):
-					try:
-						# Change root logger level (default is WARN)
-						logging.basicConfig(level=logging.INFO)
-						id = []
-						post_title = []
-						company_name = []
-						post_date = []
-						job_location = []
-						job_des = []
-						link = []
-						total_employees = []
-						actively_recruiting = []
-
-						def on_data(data: EventData):
-							print(
-								"[ON_DATA]",
-								data.title,
-								data.company,
-								data.date,
-								data.description,
-								data.link,
-								len(data.description),
-							)
-							post_title.append(
-								translator.translate(
-									data.title, lang_src="auto", lang_tgt="en"
-								)
-							)
-							# 								post_title.append(data.title)
-							id_job = len(post_title)
-							id.append(id_job)
-							job_location.append(data.place)
-							company_name.append(
-								translator.translate(
-									data.company, lang_src="auto", lang_tgt="en"
-								)
-							)
-							# 								company_name.append(data.company)
-							post_date.append(data.date)
-							job_desc = translator.translate(
-								data.description, lang_src="auto", lang_tgt="en"
-							)
-							job_des.append(job_desc)
-							link.append(data.link)
-							total_employees.append(data.total_employees)
-							actively_recruiting.append(data.actively_recruiting)
-							# print(data.description)
-							# print(job_desc)
-
-						def on_error(error):
-							print("[ON_ERROR]", error)
-
-						def on_end():
-							print("[ON_END]")
-
-						scraper = LinkedinScraper(
-							# Custom Chrome executable path (e.g. /foo/bar/bin/chromedriver)
-							chrome_executable_path="chromedriver",
-							chrome_options=None,  # Custom Chrome options here
-							headless=True,  # Overrides headless mode only if chrome_options is None
-							# How many threads will be spawned to run queries concurrently (one Chrome driver for each thread)
-							max_workers=1,
-							# Slow down the scraper to avoid 'Too many requests (429)' errors
-							slow_mo=1,
-						)
-
-						# Add event listeners
-						scraper.on(Events.DATA, on_data)
-						scraper.on(Events.ERROR, on_error)
-						scraper.on(Events.END, on_end)
-
-						queries = [
-							Query(
-								query=job_title,
-								options=QueryOptions(
-									# locations=['Indonesia'],
-									locations=Negara,
-									optimize=False,
-									limit=int(jum),
-									filters=QueryFilters(
-										#                 company_jobs_url='https://www.linkedin.com/jobs/search/?f_C=1441%2C17876832%2C791962%2C2374003%2C18950635%2C16140%2C10440912&geoId=92000000',  # Filter by companies
-										relevance=RelevanceFilters.RECENT,
-										#                 type=[TypeFilters.FULL_TIME, TypeFilters.INTERNSHIP],
-										#                 experience=None,
-									),
-								),
-							)
-						]
-
-						scraper.run(queries)
-
-						job_data = pd.DataFrame(
-							{
-								"Job_ID": id,
-								"Date": post_date,
-								"Company Name": company_name,									
-								"Total Employees": total_employees,
-								"Actively Recruiting": actively_recruiting,
-								"Job_Title": post_title,
-								"Location": job_location,
-								"Description": job_des,
-								"Link": link,
-							}
-						)
-
-						# cleaning description column
-						job_data["Description"] = job_data[
-							"Description"
-						].str.replace("\n", " ")
-
-						# print(job_data.info())
-						st.subheader("Data Hasil Scrap")
-						# job_data.head()
-						job_data.to_csv(
-							"datascraptest.csv", index=0, encoding="utf-8"
-						)
-						dframe = load_data("datascraptest.csv")
-						st.dataframe(dframe.head(10))
 					
-						st.session_state.isSearched = True
-						isSearched = st.session_state.isSearched
+				
+				# countries = []	
+				st.subheader("Perbarui Iklan Linkedin")		
+				countries = st.multiselect('Nama Negara',countries_name,[])
+				job_title = st.text_input("Input Job Title")
+				jum = st.number_input("Input Banyak Iklan yang ingin Ditelusuri", 2, 100, 5) 		
+				
+				iterate_number = []
+				if st.button("Perbarui (Test)"):
+					id = []
+					post_title = []
+					company_name = []
+					post_date = []
+					job_location = []
+					job_des = []
+					link = []
+					total_employees = []
+					actively_recruiting = []
+						
+					# countries = countries_string.split(",")
+					total_countries = len(countries)				
+					# countries_string = countries_string.replace(" ", "")	
+					if total_countries > jum :
+						st.warning("Jumlah negara yang diinput lebih dari jumlah iklan yang diinginkan.")
+						
+					
+					for i in range(total_countries):
+						temp = int(jum/total_countries)
+						iterate_number.append(temp)
 
-					except:
-						results = "Not Found"
+					sisa = jum%total_countries
+
+					for i in range(sisa):
+						iterate_number[i] += 1
+
+					st.write(countries)	
+					st.write(iterate_number)
+					# st.write(sisa)
+
+					# foreach iterate_number
+					id = []
+					post_title = []
+					company_name = []
+					post_date = []
+					job_location = []
+					job_des = []
+					link = []
+					total_employees = []
+					actively_recruiting = []
+
+					for i in range(len(iterate_number)):
+											
+
+						try:
+							# Change root logger level (default is WARN)
+							logging.basicConfig(level=logging.INFO)							
+
+							def on_data(data: EventData):
+								print(
+									"[ON_DATA]",
+									data.title,
+									data.company,
+									data.date,
+									data.description,
+									data.link,
+									len(data.description),
+								)
+								post_title.append(
+									translator.translate(
+										data.title, lang_src="auto", lang_tgt="en"
+									)
+								)
+								# 								post_title.append(data.title)
+								id_job = len(post_title)
+								id.append(id_job)
+								job_location.append(data.place)
+								company_name.append(
+									translator.translate(
+										data.company, lang_src="auto", lang_tgt="en"
+									)
+								)
+								# 								company_name.append(data.company)
+								post_date.append(data.date)
+								job_desc = translator.translate(
+									data.description, lang_src="auto", lang_tgt="en"
+								)
+								job_des.append(job_desc)
+								link.append(data.link)
+								total_employees.append(data.total_employees)
+								actively_recruiting.append(data.actively_recruiting)
+								# print(data.description)
+								# print(job_desc)
+
+							def on_error(error):
+								print("[ON_ERROR]", error)
+
+							def on_end():
+								print("[ON_END]")
+
+							scraper = LinkedinScraper(
+								# Custom Chrome executable path (e.g. /foo/bar/bin/chromedriver)
+								chrome_executable_path="chromedriver",
+								chrome_options=None,  # Custom Chrome options here
+								headless=True,  # Overrides headless mode only if chrome_options is None
+								# How many threads will be spawned to run queries concurrently (one Chrome driver for each thread)
+								max_workers=1,
+								# Slow down the scraper to avoid 'Too many requests (429)' errors
+								slow_mo=1,
+							)
+
+							# Add event listeners
+							scraper.on(Events.DATA, on_data)
+							scraper.on(Events.ERROR, on_error)
+							scraper.on(Events.END, on_end)
+
+							queries = [
+								Query(
+									query=job_title,
+									options=QueryOptions(
+										locations=countries[i],
+										optimize=False,
+										limit=int(iterate_number[i]),
+										filters=QueryFilters(
+											relevance=RelevanceFilters.RECENT,
+										),
+									),
+								)
+							]
+
+							scraper.run(queries)
+
+							
+						except:
+							results = "Not Found"
+					
+					job_data = pd.DataFrame(
+						{
+							"Job_ID": id,
+							"Date": post_date,
+							"Company Name": company_name,									
+							"Total Employees": total_employees,
+							"Actively Recruiting": actively_recruiting,
+							"Job_Title": post_title,
+							"Location": job_location,
+							"Description": job_des,
+							"Link": link,
+						}
+					)
+
+					# cleaning description column
+					job_data["Description"] = job_data[
+						"Description"
+					].str.replace("\n", " ")
+
+					# print(job_data.info())
+					st.subheader("Data Hasil Scrap")
+					# job_data.head()
+					job_data.to_csv(
+						"datascraptest.csv", index=0, encoding="utf-8"
+					)
+					dframe = load_data("datascraptest.csv")
+					st.dataframe(dframe.head(10))
+				
+					st.session_state.isSearched = True
+					isSearched = st.session_state.isSearched
 
 				st.subheader("Filter Job")
 
@@ -373,150 +411,163 @@ def main():
 					selected_filter_actively_recruiting = st.selectbox("Actively Recruiting", filter_actively_recruiting)
 
 					if st.button("Perbarui Iklan"):
-						try:
-							# Change root logger level (default is WARN)
-							logging.basicConfig(level=logging.INFO)
-							id = []
-							post_title = []
-							company_name = []
-							post_date = []
-							job_location = []
-							job_des = []
-							link = []
-							total_employees = []
-							actively_recruiting = []
+						id = []
+						post_title = []
+						company_name = []
+						post_date = []
+						job_location = []
+						job_des = []
+						link = []
+						total_employees = []
+						actively_recruiting = []
+						
+						total_countries = len(countries)				
+						
+						for i in range(total_countries):
+							temp = int(jum/total_countries)
+							iterate_number.append(temp)
 
-							def on_data(data: EventData):
-								
-								if selected_filter_actively_recruiting == None:
-									post_title.append(
-										translator.translate(
-											data.title, lang_src="auto", lang_tgt="en"
-										)
-									)
-									# 								post_title.append(data.title)
-									id_job = len(post_title)
-									id.append(id_job)
-									job_location.append(data.place)
-									company_name.append(
-										translator.translate(
-											data.company, lang_src="auto", lang_tgt="en"
-										)
-									)
-									# 								company_name.append(data.company)
-									post_date.append(data.date)
-									job_des.append(
-										translator.translate(
-											data.description, lang_src="auto", lang_tgt="en"
-										)
-									)
-									# 								job_des.append(data.description)
-									link.append(data.link)
-									total_employees.append(data.total_employees)
-									actively_recruiting.append(data.actively_recruiting)
-								
-								elif data.actively_recruiting == selected_filter_actively_recruiting:
-									post_title.append(
-										translator.translate(
-											data.title, lang_src="auto", lang_tgt="en"
-										)
-									)
-									# 								post_title.append(data.title)
-									id_job = len(post_title)
-									id.append(id_job)
-									job_location.append(data.place)
-									company_name.append(
-										translator.translate(
-											data.company, lang_src="auto", lang_tgt="en"
-										)
-									)
-									# 								company_name.append(data.company)
-									post_date.append(data.date)
-									job_des.append(
-										translator.translate(
-											data.description, lang_src="auto", lang_tgt="en"
-										)
-									)
-									# 								job_des.append(data.description)
-									link.append(data.link)
-									total_employees.append(data.total_employees)
-									actively_recruiting.append(data.actively_recruiting)
-								
+						sisa = jum%total_countries
 
-							def on_error(error):
-								print("[ON_ERROR]", error)
+						for i in range(sisa):
+							iterate_number[i] += 1
+							
+						# st.write(countries)	
+						# st.write(iterate_number)						
 
-							def on_end():
-								print("[ON_END]")
+						for i in range(len(iterate_number)):
+							
+							try:
+								# Change root logger level (default is WARN)
+								logging.basicConfig(level=logging.INFO)	
 
-							scraper = LinkedinScraper(
-								# Custom Chrome executable path (e.g. /foo/bar/bin/chromedriver)
-								chrome_executable_path="chromedriver",
-								chrome_options=None,  # Custom Chrome options here
-								headless=True,  # Overrides headless mode only if chrome_options is None
-								# How many threads will be spawned to run queries concurrently (one Chrome driver for each thread)
-								max_workers=1,
-								# Slow down the scraper to avoid 'Too many requests (429)' errors
-								slow_mo=1,
-							)
+								def on_data(data: EventData):
+									
+									if selected_filter_actively_recruiting == None:
+										post_title.append(
+											translator.translate(
+												data.title, lang_src="auto", lang_tgt="en"
+											)
+										)
+										# 								post_title.append(data.title)
+										id_job = len(post_title)
+										id.append(id_job)
+										job_location.append(data.place)
+										company_name.append(
+											translator.translate(
+												data.company, lang_src="auto", lang_tgt="en"
+											)
+										)
+										# 								company_name.append(data.company)
+										post_date.append(data.date)
+										job_des.append(
+											translator.translate(
+												data.description, lang_src="auto", lang_tgt="en"
+											)
+										)
+										# 								job_des.append(data.description)
+										link.append(data.link)
+										total_employees.append(data.total_employees)
+										actively_recruiting.append(data.actively_recruiting)
+									
+									elif data.actively_recruiting == selected_filter_actively_recruiting:
+										post_title.append(
+											translator.translate(
+												data.title, lang_src="auto", lang_tgt="en"
+											)
+										)
+										# 								post_title.append(data.title)
+										id_job = len(post_title)
+										id.append(id_job)
+										job_location.append(data.place)
+										company_name.append(
+											translator.translate(
+												data.company, lang_src="auto", lang_tgt="en"
+											)
+										)
+										# 								company_name.append(data.company)
+										post_date.append(data.date)
+										job_des.append(
+											translator.translate(
+												data.description, lang_src="auto", lang_tgt="en"
+											)
+										)
+										# 								job_des.append(data.description)
+										link.append(data.link)
+										total_employees.append(data.total_employees)
+										actively_recruiting.append(data.actively_recruiting)
+									
 
-							# Add event listeners
-							scraper.on(Events.DATA, on_data)
-							scraper.on(Events.ERROR, on_error)
-							scraper.on(Events.END, on_end)
+								def on_error(error):
+									print("[ON_ERROR]", error)
 
-							queries = [
-								Query(
-									query=job_title,
-									options=QueryOptions(
-										# locations=['Indonesia'],
-										locations=Negara,
-										optimize=False,
-										limit=int(jum),
-										filters=QueryFilters(
-											#                 company_jobs_url='https://www.linkedin.com/jobs/search/?f_C=1441%2C17876832%2C791962%2C2374003%2C18950635%2C16140%2C10440912&geoId=92000000',  # Filter by companies
-											relevance=RelevanceFilters.RECENT,
-											type=jobtype,
-											time=time_iklan,
-											#                 type=[TypeFilters.FULL_TIME, TypeFilters.INTERNSHIP],
-											#                 experience=None,
-										),
-									),
+								def on_end():
+									print("[ON_END]")
+
+								scraper = LinkedinScraper(
+									# Custom Chrome executable path (e.g. /foo/bar/bin/chromedriver)
+									chrome_executable_path="chromedriver",
+									chrome_options=None,  # Custom Chrome options here
+									headless=True,  # Overrides headless mode only if chrome_options is None
+									# How many threads will be spawned to run queries concurrently (one Chrome driver for each thread)
+									max_workers=1,
+									# Slow down the scraper to avoid 'Too many requests (429)' errors
+									slow_mo=1,
 								)
-							]
 
-							scraper.run(queries)
+								# Add event listeners
+								scraper.on(Events.DATA, on_data)
+								scraper.on(Events.ERROR, on_error)
+								scraper.on(Events.END, on_end)
 
-							job_data = pd.DataFrame(
-								{
-									"Job_ID": id,
-									"Date": post_date,
-									"Company Name": company_name,							
-									"Total Employees": total_employees,
-									"Actively Recruiting": actively_recruiting,
-									"Job_Title": post_title,
-									"Location": job_location,
-									"Description": job_des,
-									"Link": link,
-								}
-							)
+								queries = [
+									Query(
+										query="backend",
+										options=QueryOptions(
+											locations="indonesia",
+											optimize=False,
+											limit=int(1),
+											filters=QueryFilters(										
+												relevance=RelevanceFilters.RECENT,
+												type=jobtype,
+												time=time_iklan,
+											),
+										),
+									)
+								]
 
-							# cleaning description column
-							job_data["Description"] = job_data[
-								"Description"
-							].str.replace("\n", " ")
+								scraper.run(queries)
 
-							# print(job_data.info())
-							st.subheader("Data Hasil Scrap")
-							# job_data.head()
-							job_data.to_csv(
-								"datascraptest.csv", index=0, encoding="utf-8"
-							)
-							dframe = load_data("datascraptest.csv")
-							st.dataframe(dframe.head(10))
+							except:
+								results = "Not Found"
+							
+						job_data = pd.DataFrame(
+							{
+								"Job_ID": id,
+								"Date": post_date,
+								"Company Name": company_name,							
+								"Total Employees": total_employees,
+								"Actively Recruiting": actively_recruiting,
+								"Job_Title": post_title,
+								"Location": job_location,
+								"Description": job_des,
+								"Link": link,
+							}
+						)
 
-						except:
-							results = "Not Found"
+						# cleaning description column
+						job_data["Description"] = job_data[
+							"Description"
+						].str.replace("\n", " ")
+
+						# print(job_data.info())
+						st.subheader("Data Hasil Scrap")
+						# job_data.head()
+						job_data.to_csv(
+							"datascraptest.csv", index=0, encoding="utf-8"
+						)
+						dframe = load_data("datascraptest.csv")
+						st.dataframe(dframe.head(10))
 				else:
 					st.error("Silahkan perbarui iklan terlebih dahulu.")
 					
