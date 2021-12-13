@@ -522,11 +522,11 @@ def main():
 
 								queries = [
 									Query(
-										query="backend",
+										query=job_title,
 										options=QueryOptions(
-											locations="indonesia",
+											locations=countries[i],
 											optimize=False,
-											limit=int(1),
+											limit=int(iterate_number[i]),
 											filters=QueryFilters(										
 												relevance=RelevanceFilters.RECENT,
 												type=jobtype,
