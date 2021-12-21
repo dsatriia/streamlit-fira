@@ -86,6 +86,9 @@ def load_data(data):
 	df = pd.read_csv(data)
 	return df
 
+#topic coherence
+from gensim.models import CoherenceModel
+
 def local_css(file_name):
 	with open(file_name) as f:
 		st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -613,7 +616,7 @@ def main():
 					if isCvDataUpdated == True:		
 						st.write("Click the button to download CV template")	
 
-						with open("templatecv.csv", "rb") as file:
+						with open("templatecv.csv", "rb") as file:  #Read the file in Binary mode : untuk buka doc, biner : bahasa mesin. wb: untuk menulis
 
 							st.download_button(
 								label="Download",
@@ -717,8 +720,29 @@ def main():
 								corpus, smartirs="npu")
 							corpus_tfidf = tfidf[corpus]
 
+							#baruuuuuuuuuuuuuu
+							num_topics = list(range(1,4))
+							coherence_scores = []
+
+							for i in num_topics:
+								lsa_model = LsiModel(corpus=corpus, num_topics=i, id2word = dictionary)
+								coherence_model = CoherenceModel(model=lsa_model, texts=y, dictionary=dictionary, coherence='c_v')
+								coherence_lsa = coherence_model.get_coherence()
+
+								coherence_scores.append(coherence_lsa)
+
+							for m, cv in zip(num_topics, coherence_scores):
+    								st.write("Num Topics =", m, "has Coherence Value of", round(cv, 3))
+							#short paling besar input ke num_topics=bigest
+
+							#mengambil nilai dalam array
+							max_Coherence = np.argmax(coherence_scores)
+
+							st.write("numb of topic:",max_Coherence)
+							st.write("best coherence score:",coherence_scores[max_Coherence])
+
 							lsi_model = LsiModel(
-								corpus=corpus_tfidf, id2word=dictionary, num_topics=3
+								corpus=corpus_tfidf, id2word=dictionary, num_topics=max_Coherence
 							)
 							print(
 								"Derivation of Term Matrix T of Training Document Word Stems: ",
@@ -832,7 +856,7 @@ def main():
 				education_section = st.text_area('Education Section:',education_value,200)
 
 				experience_value =" "		
-				experience_section = st.text_area('Experience Section:',experience_value,200)
+				experience_section = st.text_area('Experience Section:',experience_value,500)
 
 
 				skill_value =" "
@@ -860,7 +884,7 @@ def main():
 						writer.writeheader()
 						writer.writerows(rows)
 
-				st.subheader("Download CV ")		
+				st.subheader("Download Template CV ")	
 				if isCvDataUpdated == True:		
 					st.write("Click the button to download CV template")	
 
@@ -871,8 +895,10 @@ def main():
 							data=file,
 							file_name="template.csv",
 							mime="text/csv",
-						)				
-
+						)		
+					st.subheader("CV Writing Guide")
+					image = Image.open("panduanedit.png")
+					st.image(image, caption="Format CV")
 				else:
 					st.error("Please update CV data first.")
 				
