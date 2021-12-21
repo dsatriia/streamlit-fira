@@ -2,9 +2,7 @@ import streamlit as st
 import os
 
 #packages input cv 
-from tempfile import NamedTemporaryFile
 import csv
-import shutil
 
 #packages translate
 from google_trans_new import google_translator
@@ -415,7 +413,10 @@ def main():
 						
 						# Fungsi len() digunakan untuk mengetahui panjang (jumlah item atau anggota) dari objek
 						total_countries = len(countries)				
-						
+						if total_countries == 0:
+							st.error("Please select at least one country.")
+							return
+							
 						for i in range(total_countries):
 							temp = int(jum/total_countries)
 							iterate_number.append(temp)
