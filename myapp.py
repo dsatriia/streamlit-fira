@@ -1,9 +1,10 @@
+import streamlit as st
+import os
+
+#packages input cv 
 from tempfile import NamedTemporaryFile
 import csv
 import shutil
-
-import streamlit as st
-import os
 
 #packages translate
 from google_trans_new import google_translator
@@ -59,12 +60,15 @@ stop_words = set(stopwords.words("english"))
 if 'isSearched' not in st.session_state:
     st.session_state['isSearched'] = False
 
+#session fitur upload cv dll
 if 'isUser' not in st.session_state:
     st.session_state['isUser'] = False
 
+#session login admin
 if 'isAdmin' not in st.session_state:
     st.session_state['isAdmin'] = False
 
+#session download cv setelah diedit
 if 'isCvDataUpdated' not in st.session_state:
     st.session_state['isCvDataUpdated'] = False
 
@@ -168,25 +172,20 @@ def main():
 	"""Login"""
 	# st.title("Welcome")
 
-	menu = ["Home", "Login", "SignUp", "About", "Administrator"]
-	choice = st.sidebar.selectbox("Menu", menu)
+	menu = ["Home", "SignUp", "About", "Administrator"]
+	choice = st.selectbox("Menu", menu)
 
 	isSearched = st.session_state.isSearched
 	isCvDataUpdated = st.session_state.isCvDataUpdated
-	
-	if choice == "Home":
-		st.title("Home")
-		st.subheader("Visit the Sidebar to Login")
-		image = Image.open("logoku.png")
-		st.image(image, width=400)
 
-	elif choice == "Login":
-		st.title("Login Section")		
-		username = st.sidebar.text_input("User Name")
-		password = st.sidebar.text_input("Password", type="password")
+	if choice == "Home":
+		st.title("Login Here")
+			
+		username = st.text_input("User Name")
+		password = st.text_input("Password", type="password")
 		result = False
 
-		if st.sidebar.button("Login"):
+		if st.button("Login"):
 			create_usertable()
 			hashed_pswd = make_hashes(password)
 			result = login_user(username, check_hashes(password, hashed_pswd))
@@ -195,7 +194,7 @@ def main():
 			st.session_state.isUser = True
 
 		if st.session_state.isUser == True:
-			st.success("Logged In as {}".format(username))
+			st.success("Logged In as {}".format(username))		
 			
 			st.subheader("Recommendation System Guide")
 			video_file = open('tutorial.mp4', 'rb')
@@ -230,6 +229,9 @@ def main():
 						
 					# countries = countries_string.split(",")
 					total_countries = len(countries)				
+					if total_countries == 0:
+						st.error("Please select at least one country.")
+						return
 					# countries_string = countries_string.replace(" ", "")	
 					if total_countries > jum :  #minimal 1 negara 1 iklan yg dicari. misal 4 negara input dengan pencarian 3 maka muncul warning
 						st.warning("The number of countries entered is more than the number of desired ads.")
@@ -558,21 +560,70 @@ def main():
 				else:
 					st.error("Please update the ad first.")
 					
-				st.subheader("Download CV Template")
 				if isSearched == True:
-					st.write("Click the button to download CV template")
-					# st.write('https://drive.google.com/file/d/1LUyxJgdXEQdPMTuqSCdNjdIKqVjE7z80/view?usp=sharing')
-					with open("templatecv.csv", "rb") as file:
-						btn = st.download_button(
-							label="Download",
-							data=file,
-							file_name="template.csv",
-							mime="text/csv",
-						)
-					st.subheader("CV Writing Guide")
-					image = Image.open("panduanedit.png")
-					st.image(image, caption="Format CV")
-				
+					# st.write("Click the button to download CV template")
+					# # st.write('https://drive.google.com/file/d/1LUyxJgdXEQdPMTuqSCdNjdIKqVjE7z80/view?usp=sharing')
+					# with open("templatecv.csv", "rb") as file:
+					# 	btn = st.download_button(
+					# 		label="Download",
+					# 		data=file,
+					# 		file_name="template.csv",
+					# 		mime="text/csv",
+					# 	)
+					# st.subheader("CV Writing Guide")
+					# image = Image.open("panduanedit.png")
+					# st.image(image, caption="Format CV")
+					st.subheader("Update CV Data")		
+					education_value =""		
+					pic1 = Image.open("templateexample.jpg")
+					st.image(pic1, caption="example")
+					education_section = st.text_area('Education Section:',education_value,200)
+					
+					experience_value =" "		
+					experience_section = st.text_area('Experience Section:',experience_value,200)
+					
+
+					skill_value =" "
+					skill_section = st.text_area('Skill Section:',skill_value,200)
+					
+					if st.button("Update Data"):
+						cv_desc_value = "Education Section: " + education_section + ", " + "Experience Section: " + experience_section + ", " + "Skills Section: " + skill_section
+						st.warning(cv_desc_value)
+
+						st.success("CV Data Updated!")
+						st.session_state.isCvDataUpdated = True
+						isCvDataUpdated = st.session_state.isCvDataUpdated	
+
+						cv_desc_value = "Education Section: " + education_section + ", " + "Experience Section: " + experience_section + ", " + "Skills Section: " + skill_section
+						# csv header
+						fieldnames = ['cv_desc']
+
+						# csv data
+						rows = [
+							{'cv_desc': cv_desc_value}
+						]
+
+						with open('templatecv.csv', 'w', encoding='UTF8', newline='') as f:
+							writer = csv.DictWriter(f, fieldnames=fieldnames)
+							writer.writeheader()
+							writer.writerows(rows)
+
+					st.subheader("Download CV ")		
+					if isCvDataUpdated == True:		
+						st.write("Click the button to download CV template")	
+
+						with open("templatecv.csv", "rb") as file:
+
+							st.download_button(
+								label="Download",
+								data=file,
+								file_name="template.csv",
+								mime="text/csv",
+							)				
+
+					else:
+						st.error("Please update CV data first.")
+			
 				st.subheader(
 					"Upload CV to Find Job Ad Recommendations")
 				# st.write(st.session_state.isSearched)
@@ -697,7 +748,6 @@ def main():
 							most_similar_document_test = train_text[
 								np.argmax(cosine_similarities_test)
 							]
-
 							 							
 							#Mengubah nilai cosine float ke persentase
 							cst1 = cosine_similarities_test*int(100)
@@ -749,25 +799,53 @@ def main():
 					st.error("Please update the ad first.")
 
 			elif task == "CV Template":
+				st.subheader("Download CV ")
+				# st.write("Click the button to download CV template")
+				# # st.write('https://drive.google.com/file/d/1LUyxJgdXEQdPMTuqSCdNjdIKqVjE7z80/view?usp=sharing')
+				# with open("templatecv.csv", "rb") as file:
+				# 	btn = st.download_button(
+				# 		label="Download",
+				# 		data=file,
+				# 		file_name="template.csv",
+				# 		mime="text/csv",
+				# 	)
+				# st.subheader("CV Writing Guide")
+				# image = Image.open("panduanedit.png")
+				# st.image(image, caption="Format CV")
+								# st.write("Click the button to download CV template")
+					# # st.write('https://drive.google.com/file/d/1LUyxJgdXEQdPMTuqSCdNjdIKqVjE7z80/view?usp=sharing')
+					# with open("templatecv.csv", "rb") as file:
+					# 	btn = st.download_button(
+					# 		label="Download",
+					# 		data=file,
+					# 		file_name="template.csv",
+					# 		mime="text/csv",
+					# 	)
+					# st.subheader("CV Writing Guide")
+					# image = Image.open("panduanedit.png")
+					# st.image(image, caption="Format CV")
 				st.subheader("Update CV Data")		
-				education_value ="2017-Victoria University, Statistics, PhD in Statistics 2014-Victoria University, Computational Mathematics, Master of Science 2012-Melbourne University, Computer Science, Bachelor of Science If you're a recent graduate and you don't have relevant job experience or no experience at all, you should list what you have accomplished during your education."		
+				education_value =""		
+				pic1 = Image.open("templateexample.jpg")
+				st.image(pic1, caption="example")
 				education_section = st.text_area('Education Section:',education_value,200)
-						
-				experience_value ="Refined personalization algorithms for 1.5M+ customers on web and mobile, boosting engagement and time spent on the platform by 25%. Increased team efficiency by 20% and reduced the company's costs by 27% by solving complex business problems using Machine Learning techniques like Regression, Classification, Supervised and Unsupervised Recommenders. Increased the company's revenue by 15% by locating and defining 2 new process improvement opportunities. Worked closely with management to prioritize reporting needs, provided analysis and deep insights around critical indicators of the company performance, like volume, gross profit, and warehouse efficiency."		
+
+				experience_value =" "		
 				experience_section = st.text_area('Experience Section:',experience_value,200)
 
-				skill_value ="Machine Learning, Data Mining, Data Management, Big Data, Quantitative Analysis, Visualization Tools, Python, TensorFlow ,PyTorch ,SpaCy ,NLTK ,SQL ,Hadoop ,Apache ,Spark ,Excel, SAS, MatLab, R"
+
+				skill_value =" "
 				skill_section = st.text_area('Skill Section:',skill_value,200)
 
 				if st.button("Update Data"):
-					cv_desc_value = "Education Section: " + education_section + " " + "Experience Section: " + experience_section + " " + "Skills Section: " + skill_section
+					cv_desc_value = "Education Section: " + education_section + ", " + "Experience Section: " + experience_section + ", " + "Skills Section: " + skill_section
 					st.warning(cv_desc_value)
-					
+
 					st.success("CV Data Updated!")
 					st.session_state.isCvDataUpdated = True
 					isCvDataUpdated = st.session_state.isCvDataUpdated	
 
-					cv_desc_value = "Education Section: " + education_section + " " + "Experience Section: " + experience_section + " " + "Skills Section: " + skill_section
+					cv_desc_value = "Education Section: " + education_section + ", " + "Experience Section: " + experience_section + ", " + "Skills Section: " + skill_section
 					# csv header
 					fieldnames = ['cv_desc']
 
@@ -780,28 +858,28 @@ def main():
 						writer = csv.DictWriter(f, fieldnames=fieldnames)
 						writer.writeheader()
 						writer.writerows(rows)
-										
-				
-				st.subheader("Download Template CV ")		
+
+				st.subheader("Download CV ")		
 				if isCvDataUpdated == True:		
 					st.write("Click the button to download CV template")	
 
 					with open("templatecv.csv", "rb") as file:
-						
+
 						st.download_button(
 							label="Download",
 							data=file,
 							file_name="template.csv",
 							mime="text/csv",
 						)				
-					st.subheader("CV Writing Guide")
-					image = Image.open("panduanedit.png")
-					st.image(image, caption="Format CV")
+
 				else:
 					st.error("Please update CV data first.")
-
+				
 		else:
-			st.warning("Incorrect Username/Password")			
+			st.warning("Incorrect Username/Password")
+		
+		image = Image.open("logoku.png")
+		st.image(image, width=500)			
 
 	elif choice == "SignUp":
 		st.title("Create New Account")
@@ -822,14 +900,14 @@ def main():
 		st.write("Get job recommendations that match your curriculum vitae")
 
 	elif choice == "Administrator":
-		username = st.sidebar.text_input("Username Admin")
-		password = st.sidebar.text_input("Password Admin", type="password")
-		result_admin = False
+		username = st.text_input("Username Admin")
+		password = st.text_input("Password Admin", type="password")
+		result_admin = False    #inisialisasi awal / value awal
 		result_user = False
 
 		st.title("Profiles")
 
-		if st.sidebar.button("Login Admin"):
+		if st.button("Login Admin"):
 			create_usertable()
 			hashed_pswd = make_hashes(password)
 			result_admin = login_admin(
@@ -1243,7 +1321,5 @@ def main():
 			st.info(
 				"This page can only be accessed by admin. Please login as admin first.")
 		
-
-
 if __name__ == "__main__":
 	main()
