@@ -331,13 +331,13 @@ class AuthenticatedStrategy(Strategy):
                         ''',
                         Selectors.description)
 
-                    # Extract
+                   # Extract
                     debug(tag, 'Evaluating selectors', [Selectors.totalEmployees])
 
                     company_total_employees, company_total_employees_html = driver.execute_script(
                         '''
                             const el = document.querySelector(arguments[0]);
-                            let el2 = el.children[1].children[2].children[1];
+                            let el2 = el.children[1].children[2].children[0];
 
                             return [
                                 el2.innerText,
@@ -352,7 +352,7 @@ class AuthenticatedStrategy(Strategy):
                     actively_recruiting, actively_recruiting_html = driver.execute_script(
                         '''
                             const el = document.querySelector(arguments[0]);
-                            let el2 = el.children[1].children[2].children[3];
+                            let el2 = el.children[1].children[2].children[0].children[4];
                             
                             let isActive = 'No';
 
